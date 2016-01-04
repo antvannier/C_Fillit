@@ -6,7 +6,7 @@
 /*   By: avannier <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/17 13:50:17 by avannier          #+#    #+#             */
-/*   Updated: 2015/12/17 14:01:45 by avannier         ###   ########.fr       */
+/*   Updated: 2015/12/27 12:16:36 by mszczesn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,45 +17,45 @@
 # include <fcntl.h>
 # define BUF_SIZE (546)
 
-typedef	struct		s_map
+typedef struct	s_map
 {
 	char			**map;
 	unsigned char	size;
-}					t_map;
+}				t_map;
 
-typedef	struct		s_piece
+typedef struct	s_tetri
 {
 	char			letter;
-	unsigned char	x;
+	unsigned char	size_y;
+	unsigned char	size_x;
 	unsigned char	y;
-	unsigned char	ysize;
-	unsigned char	xsize;
-	char			piece[4][4];
-	struct s_piece	*next;
-}					t_piece;
+	unsigned char	x;
+	char			map[4][4];
+	struct s_tetri	*next;
+}				t_tetri;
 
-int					ft_finish(t_piece **piece);
-void				ft_freepiece (t_piece *piece);
-char				ft_resolve(t_piece *str, t_map *map);
-char				ft_checkmap(t_piece *str, t_map *map);
-void				ft_suprpiece(t_piece *str, t_map *map);
-void				ft_writepiece(t_piece *str, t_map *map);
-int					ft_openfile(char *file);
-int					ft_getpiece(char *str, t_piece **firstpiece,
-								unsigned char *numberpiece, int letter);
-int					ft_piececonvertion(char **str, t_piece *pieces);
-int					ft_getmap(t_piece **firstpiece, unsigned char *numberpiece);
-t_map				*ft_initialmap(unsigned char size);
-unsigned char		ft_mapmin(unsigned char numberpiece, t_piece **firstpiece);
-void				ft_printmap(t_map *map);
-void				ft_putchar(char c);
-int					ft_checkpiece(t_piece *str);
-unsigned char		ft_checknext(t_piece *str, unsigned char y,
-									unsigned char x);
-unsigned char		ft_checkvalid(t_piece *str, unsigned char y,
-									unsigned char x);
-void				ft_movepiece(t_piece *str);
-void				ft_movepiece2(t_piece *str, unsigned char movex,
-									unsigned char movey);
+int				sub_function(char *file);
+
+int				get_tetri(char *s, t_tetri **first, unsigned char *nb, int c);
+int				convert_tetri(char **buf, t_tetri *minos);
+void			get_mv_to_topleft(t_tetri *s);
+void			move_to_topleft(t_tetri *s, unsigned char my, unsigned char mx);
+int				check_tetri(t_tetri *minos);
+unsigned char	check_next(t_tetri *s, unsigned char y, unsigned char x);
+unsigned char	check_valid(t_tetri *s, unsigned char y, unsigned char x);
+
+int				get_map(t_tetri **first, unsigned char *nb);
+unsigned char	get_sq_min(unsigned char nb, t_tetri **first);
+t_map			*create_and_init_map(unsigned char size);
+
+char			resolve(t_tetri *minos, t_map *map);
+char			check_map(t_tetri *minos, t_map *map);
+void			write_in_map(t_tetri *minos, t_map *map);
+void			del_tetri(t_tetri *minos, t_map *map);
+
+void			display_map(t_map *map);
+void			ft_putchar(char c);
+int				end(t_tetri **first);
+void			free_tetri(t_tetri *first);
 
 #endif

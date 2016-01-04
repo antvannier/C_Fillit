@@ -6,16 +6,16 @@
 /*   By: mszczesn <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/16 11:00:53 by mszczesn          #+#    #+#             */
-/*   Updated: 2015/12/17 11:03:05 by avannier         ###   ########.fr       */
+/*   Updated: 2015/12/27 12:14:04 by mszczesn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fillit.h"
 
-int				ft_checkpiece(t_piece *str)
+int				check_tetri(t_tetri *s)
 {
-	unsigned char	x;
 	unsigned char	y;
+	unsigned char	x;
 	int				ret;
 
 	y = 0;
@@ -24,100 +24,100 @@ int				ft_checkpiece(t_piece *str)
 		x = 0;
 		while (x < 4)
 		{
-			if (str->piece[y][x] == str->letter)
-				if (!(ret = ft_checkvalid(str, y, x))
-						|| (ret == 1 && ft_checknext(str, y, x)))
+			if (s->map[y][x] == s->letter)
+				if (!(ret = check_valid(s, y, x))
+						|| (ret == 1 && check_next(s, y, x)))
 					return (1);
 			x++;
 		}
 		y++;
 	}
-	ft_movepiece(str);
+	get_mv_to_topleft(s);
 	return (0);
 }
 
-unsigned char	ft_checknext(t_piece *str, unsigned char y, unsigned char x)
+unsigned char	check_next(t_tetri *s, unsigned char y, unsigned char x)
 {
-	if (x < 3 && str->piece[y][x + 1] == str->letter)
-		if (ft_checkvalid(str, y, x + 1) < 2)
+	if (x < 3 && s->map[y][x + 1] == s->letter)
+		if (check_valid(s, y, x + 1) < 2)
 			return (1);
-	if (x && str->piece[y][x - 1] == str->letter)
-		if (ft_checkvalid(str, y, x - 1) < 2)
+	if (x && s->map[y][x - 1] == s->letter)
+		if (check_valid(s, y, x - 1) < 2)
 			return (1);
-	if (y < 3 && str->piece[y + 1][x] == str->letter)
-		if (ft_checkvalid(str, y + 1, x) < 2)
+	if (y < 3 && s->map[y + 1][x] == s->letter)
+		if (check_valid(s, y + 1, x) < 2)
 			return (1);
-	if (y && str->piece[y - 1][x] == str->letter)
-		if (ft_checkvalid(str, y - 1, x) < 2)
+	if (y && s->map[y - 1][x] == s->letter)
+		if (check_valid(s, y - 1, x) < 2)
 			return (1);
 	return (0);
 }
 
-unsigned char	ft_checkvalid(t_piece *str, unsigned char y, unsigned char x)
+unsigned char	check_valid(t_tetri *s, unsigned char y, unsigned char x)
 {
-	unsigned char counter;
+	unsigned char	counter;
 
 	counter = 0;
-	if (x < 3 && str->piece[y][x + 1] == str->letter)
+	if (x < 3 && s->map[y][x + 1] == s->letter)
 		counter++;
-	if (x && str->piece[y][x - 1] == str->letter)
+	if (x && s->map[y][x - 1] == s->letter)
 		counter++;
-	if (y < 3 && str->piece[y + 1][x] == str->letter)
+	if (y < 3 && s->map[y + 1][x] == s->letter)
 		counter++;
-	if (y && str->piece[y - 1][x] == str->letter)
+	if (y && s->map[y - 1][x] == s->letter)
 		counter++;
 	return (counter);
 }
 
-void			ft_movepiece(t_piece *str)
+void			get_mv_to_topleft(t_tetri *s)
 {
-	unsigned char x;
-	unsigned char y;
-	unsigned char movex;
-	unsigned char movey;
+	unsigned char	y;
+	unsigned char	y_move;
+	unsigned char	x;
+	unsigned char	x_move;
 
 	y = 0;
-	movey = 4;
-	movex = 4;
+	x_move = 4;
+	y_move = 4;
 	while (y < 4)
 	{
 		x = 0;
 		while (x < 4)
 		{
-			if (str->piece[y][x] == str->letter && (movex > x))
-				movex = x;
-			if (str->piece[y][x] == str->letter && (movey > y))
-				movey = y;
+			if (s->map[y][x] == s->letter && (x_move > x))
+				x_move = x;
+			if (s->map[y][x] == s->letter && (y_move > y))
+				y_move = y;
 			x++;
 		}
 		y++;
 	}
-	ft_movepiece2(str, movex, movey);
+	move_to_topleft(s, y_move, x_move);
 }
 
-void			ft_movepiece2(t_piece *str, unsigned char movex,
-									unsigned char movey)
+void			move_to_topleft(t_tetri *s, unsigned char y_move,
+		unsigned char x_move)
 {
-	unsigned char x;
-	unsigned char y;
+	unsigned char	y;
+	unsigned char	x;
 
 	y = 0;
-	str->xsize = 0;
-	str->ysize = 0;
+	s->size_x = 0;
+	s->size_y = 0;
 	while (y < 4)
 	{
 		x = 0;
 		while (x < 4)
 		{
-			if (str->piece[y][x] == str->letter)
+			if (s->map[y][x] == s->letter)
 			{
-				if (movex || movey)
+				if (y_move || x_move)
 				{
-					str->piece[y - movey][x - movex] = str->letter;
-					str->piece[y][x] = '.';
+					s->map[y - y_move][x - x_move] = s->letter;
+					s->map[y][x] = '.';
 				}
-				str->xsize = x - movex > str->xsize ? x - movex : str->xsize;
-				str->ysize = y - movey > str->ysize ? y - movey : str->ysize;
+				s->size_x = x - x_move > s->size_x ? x - x_move : s->size_x;
+				s->size_y = y - y_move > s->size_y ? y - y_move : s->size_y;
 			}
 			x++;
 		}

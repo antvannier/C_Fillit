@@ -6,76 +6,76 @@
 /*   By: mszczesn <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/16 12:24:09 by mszczesn          #+#    #+#             */
-/*   Updated: 2015/12/17 11:05:21 by avannier         ###   ########.fr       */
+/*   Updated: 2015/12/27 12:23:18 by mszczesn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fillit.h"
 
-int				ft_getmap(t_piece **firstpiece, unsigned char *numberpiece)
+int				get_map(t_tetri **first, unsigned char *nb_tetri)
 {
 	t_map	*map;
 
-	if (!(map = ft_initialmap(3 + *numberpiece)))
+	if (!(map = create_and_init_map(3 + *nb_tetri)))
 		return (1);
-	map->size = ft_mapmin(*numberpiece, firstpiece);
-	while (ft_resolve(*firstpiece, map))
+	map->size = get_sq_min(*nb_tetri, first);
+	while (resolve(*first, map))
 		map->size += 1;
-	ft_printmap(map);
+	display_map(map);
 	free(map);
 	return (0);
 }
 
-t_map			*ft_initialmap(unsigned char size)
+t_map			*create_and_init_map(unsigned char size)
 {
-	char			**charmap;
+	char			**mapchar;
 	t_map			*map;
-	unsigned char	x;
 	unsigned char	y;
+	unsigned char	x;
 
 	y = 0;
 	if (!(map = (t_map*)malloc(sizeof(t_map))))
 		return (NULL);
-	if (!(charmap = (char **)malloc(sizeof(char *) * size)))
+	if (!(mapchar = (char**)malloc(sizeof(char*) * size)))
 		return (NULL);
 	while (y < size)
 	{
-		if (!(charmap[y] = (char *)malloc(sizeof(char) * size)))
+		if (!(mapchar[y] = (char*)malloc(sizeof(char) * size)))
 			return (NULL);
 		x = 0;
 		while (x < size)
 		{
-			charmap[y][x] = '.';
+			mapchar[y][x] = '.';
 			x++;
 		}
 		y++;
 	}
-	map->map = charmap;
+	map->map = mapchar;
 	return (map);
 }
 
-unsigned char	ft_mapmin(unsigned char numberpiece, t_piece **firstpiece)
+unsigned char	get_sq_min(unsigned char nb, t_tetri **first)
 {
 	unsigned char	i;
-	t_piece			*pieces;
+	t_tetri			*minos;
 
 	i = 0;
-	pieces = *firstpiece;
-	while ((i * i) < (numberpiece * 4))
+	minos = *first;
+	while ((i * i) < (nb * 4))
 		i++;
-	while (pieces)
+	while (minos)
 	{
-		i = i < pieces->y + 1 ? pieces->y + 1 : i;
-		i = i < pieces->x + 1 ? pieces->x + 1 : i;
-		pieces = pieces->next;
+		i = i < minos->y + 1 ? minos->y + 1 : i;
+		i = i < minos->x + 1 ? minos->x + 1 : i;
+		minos = minos->next;
 	}
 	return (i);
 }
 
-void			ft_printmap(t_map *map)
+void			display_map(t_map *map)
 {
-	int				x;
-	int				y;
+	int x;
+	int	y;
 
 	y = 0;
 	while (y < map->size)

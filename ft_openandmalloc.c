@@ -6,96 +6,94 @@
 /*   By: mszczesn <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/16 11:01:16 by mszczesn          #+#    #+#             */
-/*   Updated: 2015/12/17 10:54:19 by avannier         ###   ########.fr       */
+/*   Updated: 2015/12/27 12:21:06 by mszczesn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fillit.h"
 
-int	ft_openfile(char *file)
+int	sub_function(char *file)
 {
+	unsigned char	*nb_tetri;
 	int				fd;
 	int				ret;
-	char			buf[BUF_SIZE + 1];
-	unsigned char	*numberpiece;
-	t_piece			**firstpiece;
+	char			buffer[BUF_SIZE + 1];
+	t_tetri			**first;
 
-	numberpiece = (unsigned char *)malloc(sizeof(unsigned char));
-	if ((fd = open(file, O_RDONLY)) == -1 || !numberpiece)
+	nb_tetri = (unsigned char*)malloc(sizeof(unsigned char));
+	if ((fd = open(file, O_RDONLY)) == -1 || !nb_tetri)
 		return (1);
-	if ((ret = read(fd, buf, BUF_SIZE)) == -1)
+	if ((ret = read(fd, buffer, BUF_SIZE)) == -1)
 		return (1);
 	if (close(fd) == -1)
 		return (1);
 	if (ret > 545)
 		return (1);
-	buf[ret] = '\0';
-	if (!(firstpiece = (t_piece**)malloc(sizeof(t_piece*))))
+	buffer[ret] = '\0';
+	if (!(first = (t_tetri**)malloc(sizeof(t_tetri*))))
 		return (2);
 	ret = 'A';
-	if (ft_getpiece(buf, firstpiece, numberpiece, ret)
-		|| ft_getmap(firstpiece, numberpiece))
+	if (get_tetri(buffer, first, nb_tetri, ret) || get_map(first, nb_tetri))
 		return (1);
-	ft_finish(firstpiece);
-	free(numberpiece);
+	end(first);
+	free(nb_tetri);
 	return (0);
 }
 
-int	ft_getpiece(char *str, t_piece **firstpiece,
-				unsigned char *numberpiece, int letter)
+int	get_tetri(char *s, t_tetri **first, unsigned char *nb_tetri, int letter)
 {
-	t_piece	*pieces;
+	t_tetri			*minos;
 
-	if (!(pieces = (t_piece*)malloc(sizeof(t_piece))))
+	if (!(minos = (t_tetri*)malloc(sizeof(t_tetri))))
 		return (2);
-	pieces->letter = letter;
-	if (ft_piececonvertion(&str, pieces) || ft_checkpiece(pieces))
+	minos->letter = letter;
+	if (convert_tetri(&s, minos) || check_tetri(minos))
 		return (1);
-	*firstpiece = pieces;
-	while (*str)
+	*first = minos;
+	while (*s)
 	{
 		letter++;
-		if (*str != '\n')
+		if (*s != '\n')
 			return (1);
-		str += 1;
-		if (!*str)
+		s += 1;
+		if (!*s)
 			return (1);
-		if (!(pieces->next = (t_piece*)malloc(sizeof(t_piece))))
+		if (!(minos->next = (t_tetri*)malloc(sizeof(t_tetri))))
 			return (2);
-		pieces = pieces->next;
-		pieces->letter = letter;
-		if (ft_piececonvertion(&str, pieces) || ft_checkpiece(pieces))
+		minos = minos->next;
+		minos->letter = letter;
+		if (convert_tetri(&s, minos) || check_tetri(minos))
 			return (1);
 	}
-	*numberpiece = letter + 1 - 'A';
+	*nb_tetri = letter + 1 - 'A';
 	return (0);
 }
 
-int	ft_piececonvertion(char **str, t_piece *pieces)
+int	convert_tetri(char **buffer, t_tetri *minos)
 {
 	unsigned char	x;
 	unsigned char	y;
-	unsigned char	counter;
+	unsigned char	count;
 
 	y = 0;
-	counter = 0;
-	pieces->next = NULL;
+	count = 0;
+	minos->next = NULL;
 	while (y < 4)
 	{
 		x = 0;
 		while (x < 4)
 		{
-			**str == '#' ? counter++ : counter;
-			if ((**str != '.' && **str != '#') || counter > 4)
+			**buffer == '#' ? count++ : count;
+			if ((**buffer != '.' && **buffer != '#') || count > 4)
 				return (1);
-			pieces->piece[y][x] = **str == '#' ? pieces->letter : '.';
+			minos->map[y][x] = **buffer == '#' ? minos->letter : '.';
 			x++;
-			*str += 1;
+			*buffer += 1;
 		}
-		if (**str != '\n')
+		if (**buffer != '\n')
 			return (1);
-		*str += 1;
+		*buffer += 1;
 		y++;
 	}
-	return (counter != 4 ? 1 : 0);
+	return (count != 4 ? 1 : 0);
 }

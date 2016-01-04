@@ -6,59 +6,56 @@
 /*   By: mszczesn <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/12/16 13:14:51 by mszczesn          #+#    #+#             */
-/*   Updated: 2015/12/17 10:56:24 by avannier         ###   ########.fr       */
+/*   Updated: 2015/12/27 12:07:00 by mszczesn         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fillit.h"
 
-char	ft_resolve(t_piece *str, t_map *map)
+char	resolve(t_tetri *s, t_map *map)
 {
 	char	ret;
 
-	str->y = 0;
-	while (str->y + str->ysize < map->size)
+	s->y = 0;
+	while (s->y + s->size_y < map->size)
 	{
-		str->x = 0;
-		while (str->x + str->xsize < map->size)
+		s->x = 0;
+		while (s->x + s->size_x < map->size)
 		{
-			if (ft_checkmap(str, map))
+			if (check_map(s, map))
 			{
-				if (str->next)
-				{
-					ret = ft_resolve(str->next, map);
-				}
-				if (!str->next || ret == 0)
+				if (s->next)
+					ret = resolve(s->next, map);
+				if (!s->next || ret == 0)
 					return (0);
-				ft_suprpiece(str, map);
+				del_tetri(s, map);
 			}
-			str->x += 1;
+			s->x += 1;
 		}
-		str->y += 1;
+		s->y += 1;
 	}
 	return (1);
 }
 
-char	ft_checkmap(t_piece *str, t_map *map)
+char	check_map(t_tetri *s, t_map *map)
 {
-	unsigned char	x;
-	unsigned char	y;
-	unsigned char	counter;
+	unsigned char y;
+	unsigned char x;
+	unsigned char counter;
 
-	y = 0;
 	counter = 0;
-	while (y <= str->ysize)
+	y = 0;
+	while (y <= s->size_y)
 	{
 		x = 0;
-		while (x <= str->xsize)
+		while (x <= s->size_x)
 		{
-			write(1, &y, 1);
-			if (map->map[str->y + y][str->x + x] == '.'
-					&& str->piece[y][x] == str->letter)
+			if (map->map[s->y + y][s->x + x] == '.'
+					&& s->map[y][x] == s->letter)
 				counter++;
 			if (counter == 4)
 			{
-				ft_writepiece(str, map);
+				write_in_map(s, map);
 				return (1);
 			}
 			x++;
@@ -68,38 +65,38 @@ char	ft_checkmap(t_piece *str, t_map *map)
 	return (0);
 }
 
-void	ft_suprpiece(t_piece *str, t_map *map)
+void	del_tetri(t_tetri *s, t_map *map)
 {
-	unsigned char x;
 	unsigned char y;
+	unsigned char x;
 
 	y = 0;
-	while (y <= str->ysize)
+	while (y <= s->size_y)
 	{
 		x = 0;
-		while (x <= str->xsize)
+		while (x <= s->size_x)
 		{
-			if (map->map[str->y + y][str->x + x] == str->letter)
-				map->map[str->y + y][str->x + x] = '.';
+			if (map->map[s->y + y][s->x + x] == s->letter)
+				map->map[s->y + y][s->x + x] = '.';
 			x++;
 		}
 		y++;
 	}
 }
 
-void	ft_writepiece(t_piece *str, t_map *map)
+void	write_in_map(t_tetri *s, t_map *map)
 {
-	unsigned char x;
-	unsigned char y;
+	unsigned char	y;
+	unsigned char	x;
 
 	y = 0;
-	while (y <= str->ysize)
+	while (y <= s->size_y)
 	{
 		x = 0;
-		while (x <= str->xsize)
+		while (x <= s->size_x)
 		{
-			if (str->piece[y][x] == str->letter)
-				map->map[str->y + y][str->x + x] = str->letter;
+			if (s->map[y][x] == s->letter)
+				map->map[s->y + y][s->x + x] = s->letter;
 			x++;
 		}
 		y++;
